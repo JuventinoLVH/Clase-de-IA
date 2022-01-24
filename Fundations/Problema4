@@ -32,7 +32,12 @@ def find_alphabetically_first_word(text: str) -> str:
     it is acceptable to either return an empty string or throw an error.
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    if(max(text) == 0) :
+        Exception("Cadena vacia")
+    palabras = " ".join(text.split())
+    palabras = palabras.split(" ")
+    palabras.sort()
+    return palabras[0]
     # END_YOUR_CODE
 
 
@@ -45,7 +50,7 @@ def euclidean_distance(loc1: Position, loc2: Position) -> float:
     are pairs of numbers (e.g., (3, 5)).
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    return math.sqrt( math.pow(loc2[0] - loc1[0],2) + (loc2[1] - loc1[1]),2)
     # END_YOUR_CODE
 
 
@@ -73,7 +78,40 @@ def mutate_sentences(sentence: str) -> List[str]:
                 (Reordered versions of this list are allowed.)
     """
     # BEGIN_YOUR_CODE (our solution is 17 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    palabras = " ".join(sentence.split())
+    palabras = sentence.split(" ")
+    tamSen = len(palabras)
+
+    ah = 0
+    _BFS = set()
+    BFS = set()
+
+    for pal in palabras :
+        BFS.add((pal))
+
+    for k in range(1,tamSen):
+
+        for el in BFS:
+            _BFS.add((el))
+        BFS.clear()
+
+        for el in _BFS:
+            ulalv = ""
+            ultimo = (el)
+            ultimo = ultimo.split(" ")
+            for alv in ultimo :
+                ulalv = alv
+            
+            ah = 1
+            for pal in palabras:
+                if pal == ulalv and ah < tamSen :
+                    aux = (el)
+                    aux = aux + " " + palabras[ah]
+                    BFS.add(aux)
+                ah+= 1
+        _BFS.clear()
+
+    return [sent for sent in BFS]
     # END_YOUR_CODE
 
 
@@ -91,7 +129,7 @@ def sparse_vector_dot_product(v1: SparseVector, v2: SparseVector) -> float:
     Note: A sparse vector has most of its entries as 0.
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    return sum(v1 * v2[i] for i, v1 in v1.items())
     # END_YOUR_CODE
 
 
@@ -110,7 +148,9 @@ def increment_sparse_vector(v1: SparseVector, scale: float, v2: SparseVector,
     This function will be useful later for linear classifiers.
     """
     # BEGIN_YOUR_CODE (our solution is 2 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    for llaves in v2.keys() :
+        v1[llaves] += scale * v2[llaves]
+
     # END_YOUR_CODE
 
 
