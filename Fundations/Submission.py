@@ -50,7 +50,7 @@ def euclidean_distance(loc1: Position, loc2: Position) -> float:
     are pairs of numbers (e.g., (3, 5)).
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
-    return math.sqrt( math.pow(loc2[0] - loc1[0],2) + (loc2[1] - loc1[1]),2)
+    return math.sqrt( math.pow(loc2[0] - loc1[0],2) + math.pow(loc2[1] - loc1[1],2) )
     # END_YOUR_CODE
 
 
@@ -130,8 +130,9 @@ def sparse_vector_dot_product(v1: SparseVector, v2: SparseVector) -> float:
     """
     # BEGIN_YOUR_CODE (our solution is 1 line of code, but don't worry if you deviate from this)
     suma =0
-    for llaves,v1 in v1.items:
-        suma += v1 * v2[llaves]
+    for llaves in v1:
+        if(v2.get(llaves) != None):
+            suma += v1[llaves] * v2[llaves]
     return suma
     # END_YOUR_CODE
 
