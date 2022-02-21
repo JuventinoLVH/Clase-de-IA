@@ -78,7 +78,7 @@ def learnPredictor(trainExamples: List[Tuple[T, int]],
             gradient,signo = gradientLoss(w, i)
             numUpdates += 1
             eta = eta / (numUpdates**(1/2))
-            increment (w , eta*signo , gradient)
+            increment (w ,-eta*signo , gradient)
     
     return w
 
