@@ -59,28 +59,26 @@ def learnPredictor(trainExamples: List[Tuple[T, int]],
     '''
     w = {}  # feature => weight
 
-    def prediccion(x):
-        fi =featureExtractor(x)
-        return (1 if(dotProduct(w,fi)) > 0 else -1)
 
+    ejemplosDesempacados = [(featureExtractor(ejemplo[0]),ejemplo[1]) for ejemplo in trainExamples]
 
     def gradientLoss(w, i):
-        x,y = trainExamples[i] 
-        phi = featureExtractor(x)
+        phi,y = ejemplosDesempacados[i]
         prodPunto = dotProduct(w,phi) * y
         if(prodPunto >= 1) : 
             return 0.0
-        return -prodPunto
+        return (phi,-y) 
+
 
     n = len(trainExamples)
     numUpdates = 1
     for t in range(numEpochs):
         for i in range(n):
             # X = caracteristicas Y = resultado esperado
-            gradient = gradientLoss(w, i)
+            gradient,signo = gradientLoss(w, i)
             numUpdates += 1
             eta = eta / (numUpdates**(1/2))
-            increment (w , eta , gradient)
+            increment (w , eta*signo , gradient)
     
     return w
 
