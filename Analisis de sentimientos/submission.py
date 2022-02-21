@@ -65,8 +65,9 @@ def learnPredictor(trainExamples: List[Tuple[T, int]],
 
 
     def gradientLoss(w, i):
-        x, y = featureExtractor(trainExamples[i])
-        prodPunto = dotProduct(w,x) * y
+        x,y = trainExamples[i] 
+        phi = featureExtractor(x)
+        prodPunto = dotProduct(w,phi) * y
         if(prodPunto >= 1) : 
             return 0.0
         return -prodPunto
@@ -75,14 +76,11 @@ def learnPredictor(trainExamples: List[Tuple[T, int]],
     numUpdates = 1
     for t in range(numEpochs):
         for i in range(n):
-            x,y = trainExamples[i] # X = caracteristicas Y = resultado esperado
+            # X = caracteristicas Y = resultado esperado
             gradient = gradientLoss(w, i)
             numUpdates += 1
             eta = eta / (numUpdates**(1/2))
             increment (w , eta , gradient)
-    #https://github.com/rohitapte/cs221/blob/master/sentiment/submission.py
-    #https://github.com/xcpeng/CS221-2/blob/master/pa2_sentiment/submission.py
-    print('epoch : w = {w}, gradientF = ')
     
     return w
 
