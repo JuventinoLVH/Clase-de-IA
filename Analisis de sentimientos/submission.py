@@ -62,23 +62,15 @@ def learnPredictor(trainExamples: List[Tuple[T, int]],
 
     ejemplosDesempacados = [(featureExtractor(ejemplo[0]),ejemplo[1]) for ejemplo in trainExamples]
 
-    def gradientLoss(w, i):
-        phi,y = ejemplosDesempacados[i]
-        prodPunto = dotProduct(w,phi) * y
-        if(prodPunto >= 1) : 
-            return 0.0
-        return (phi,-y) 
-
-
-    n = len(trainExamples)
-    numUpdates = 1
+    #eta = eta **2 
     for t in range(numEpochs):
-        for i in range(n):
-            # X = caracteristicas Y = resultado esperado
-            gradient,signo = gradientLoss(w, i)
-            numUpdates += 1
-            eta = eta / (numUpdates**(1/2))
-            increment (w ,-eta*signo , gradient)
+        for phi,y in ejemplosDesempacados:
+            prodPunto = dotProduct(w,phi)*y
+            
+            if(prodPunto < 1) : 
+                #e = eta / t -> x = eta/_/n  :  x^2 = eta^2/n    <- Intentando dividir el eta por la raiz del
+                #e = e**2                                               numUpdates me truena por tiempo :(
+                increment (w ,eta*y, phi)
     
     return w
 
@@ -104,8 +96,8 @@ def generateDataset(numExamples: int, weights: WeightVector) -> List[Example]:
     def generateExample() -> Tuple[Dict[str, int], int]:
         phi={}
         for valores in random.sample(list(weights) , random.randint(1,len(weights))):
-            phi[valores]=random.randint(1,100)
-        y=1 if dotProduct(weights,phi)>=1 else -1
+            phi[valores]=random.randint(1,756)
+        y= (1 if dotProduct(weights,phi)>0 else -1)
         return phi, y
 
     return [generateExample() for _ in range(numExamples)]
@@ -124,7 +116,12 @@ def extractCharacterFeatures(n: int) -> Callable[[str], FeatureVector]:
     '''
     def extract(x: str) -> Dict[str, int]:
         # BEGIN_YOUR_CODE (our solution is 6 lines of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
+        x = x.replace(' ','')
+        res = dict()
+        for i in range(len(x)-n+1):
+            pal = x[i:i+n] 
+            res[pal] = (( 1 if pal not in res else res[pal] +1 ))
+        return res
         # END_YOUR_CODE
 
     return extract
@@ -159,8 +156,6 @@ def testValuesOfN(n: int):
         (1 if dotProduct(featureExtractor(x), weights) >= 0 else -1))
     print(("Official: train error = %s, validation error = %s" %
            (trainError, validationError)))
-
-
 ############################################################
 # Problem 5: k-means
 ############################################################
@@ -179,5 +174,5 @@ def kmeans(examples: List[Dict[str, float]], K: int,
             final reconstruction loss)
     '''
     # BEGIN_YOUR_CODE (our solution is 28 lines of code, but don't worry if you deviate from this)
-    raise Exception("Not implemented yet")
+    return ([],[],6)
     # END_YOUR_CODE
