@@ -5,10 +5,4 @@ FeatureVector = Dict[str, int]
 WeightVector = Dict[str, float]
 Example = Tuple[FeatureVector, int]
 
-def r(n,x):
-    x = x.replace(' ','')
-    res = Dict[str,int]
-    inicial = x[:n]
-    print(inicial)
-
-r(3,"I like tacos")
+prueba = [1,2,0,1,2,1,3,32,0]

@@ -174,5 +174,68 @@ def kmeans(examples: List[Dict[str, float]], K: int,
             final reconstruction loss)
     '''
     # BEGIN_YOUR_CODE (our solution is 28 lines of code, but don't worry if you deviate from this)
-    return ([],[],6)
+    def Distancia(punto : Dict[str,float] , centro : Dict[str,float]):
+        suma=0
+        for coordenada in (punto) :
+            if coordenada in centro:
+                suma+=(punto[coordenada]-centro[coordenada])**2
+        return suma
+
+    def PuntPertCentro(punto:Dict[str,float]):
+        distMinima = Distancia(punto,pCentroides[0])
+        iMinima = 0
+        for i in range(1,K):
+            distAux = Distancia(punto,pCentroides[i]) 
+            if(distAux < distMinima):
+                distMinima = distAux
+                iMinima = i
+        return iMinima
+
+    def PuntoIgual(idCentro):
+        for i in tamMuestra:
+            if( (pertenencias[i] == idCentro or pertPasadas[i] == idCentro)
+                 and pertPasadas[i] != pertenencias[i]):
+                return False
+            
+        return True
+
+    def RecalcularPunto(idPunto):
+        res = Dict()
+        numPuntos=0
+        for i in range(tamMuestra):
+            if(pertenencias[i] == idPunto):
+                numPuntos+=1
+                for key in examples[i]:
+                    res[key] = (examples[key] if key not in res else (res[key]+examples[key]) )
+        
+        for key in res :
+            res[key] = res[key]/numPuntos
+        return res
+
+
+    pertenenciasDiferentes = True
+    pertenencias = [-1]*K
+    pertPasadas =  pertenencias.copy()
+    pCentroides = random.sample( examples , K) 
+    tamMuestra = len(examples)
+
+
+    i = 1
+    while(pertenenciasDiferentes and i < maxEpochs):
+        i+=1
+
+        for posPunto,punto in enumerate(examples):
+            pertenencias[posPunto]=PuntPertCentro(punto)
+
+        for idCentro,centro in enumerate(pCentroides):
+            if PuntoIgual(idCentro):
+                continue
+
+            contAux = 0
+            for puntPertenece in pertenencias:
+                if pertenencias[puntPertenece] != idCentro:
+                    continue
+                contAux +=1 
+
+
     # END_YOUR_CODE
