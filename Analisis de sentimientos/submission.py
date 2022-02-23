@@ -179,6 +179,8 @@ def kmeans(examples: List[Dict[str, float]], K: int,
         for coordenada in (punto) :
             if coordenada in centro:
                 suma+=(punto[coordenada]-centro[coordenada])**2
+            else:
+                suma+=(punto[coordenada])**2
         return suma
 
     def PuntPertCentro(punto:Dict[str,float]):
@@ -192,7 +194,7 @@ def kmeans(examples: List[Dict[str, float]], K: int,
         return iMinima
 
     def PuntoIgual(idCentro):
-        for i in tamMuestra:
+        for i in range(tamMuestra):
             if( (pertenencias[i] == idCentro or pertPasadas[i] == idCentro)
                  and pertPasadas[i] != pertenencias[i]):
                 return False
@@ -200,42 +202,61 @@ def kmeans(examples: List[Dict[str, float]], K: int,
         return True
 
     def RecalcularPunto(idPunto):
-        res = Dict()
+        res =  dict()
         numPuntos=0
         for i in range(tamMuestra):
             if(pertenencias[i] == idPunto):
                 numPuntos+=1
                 for key in examples[i]:
-                    res[key] = (examples[key] if key not in res else (res[key]+examples[key]) )
+                    res[key] = (examples[i][key] if key not in res else (res[key]+examples[i][key]) )
         
         for key in res :
             res[key] = res[key]/numPuntos
         return res
 
+    def Convergio():
+        for i in range(tamMuestra):
+            if(pertenencias[i] != pertPasadas[i]):
+                return False
 
-    pertenenciasDiferentes = True
-    pertenencias = [-1]*K
+        return True
+
+    tamMuestra = len(examples)
+    pertenencias = [-1]*tamMuestra
     pertPasadas =  pertenencias.copy()
     pCentroides = random.sample( examples , K) 
-    tamMuestra = len(examples)
+    
+
+
+    for posPunto,punto in enumerate(examples):
+            pertenencias[posPunto]=PuntPertCentro(punto)
+
+    for idCentro,centro in enumerate(pCentroides):
+        if PuntoIgual(idCentro):
+            continue
+        pCentroides[idCentro] = RecalcularPunto(idCentro)
+    
+    for i in range(tamMuestra):
+        pertPasadas[i] = pertenencias[i]
 
 
     i = 1
-    while(pertenenciasDiferentes and i < maxEpochs):
+    while(i < maxEpochs):
         i+=1
 
         for posPunto,punto in enumerate(examples):
             pertenencias[posPunto]=PuntPertCentro(punto)
 
+        if(Convergio()):
+            break
+
         for idCentro,centro in enumerate(pCentroides):
             if PuntoIgual(idCentro):
                 continue
+            pCentroides[idCentro] = RecalcularPunto(idCentro)
+        
+        for i in range(tamMuestra):
+            pertPasadas[i] = pertenencias[i]
 
-            contAux = 0
-            for puntPertenece in pertenencias:
-                if pertenencias[puntPertenece] != idCentro:
-                    continue
-                contAux +=1 
-
-
+    return pCentroides,pertenencias,2
     # END_YOUR_CODE
