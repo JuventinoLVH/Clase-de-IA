@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
+from calendar import EPOCH
+import math
 import random
+from turtle import dot
 from typing import Callable, Dict, List, Tuple, TypeVar, DefaultDict
 
 from util import *
@@ -174,34 +177,34 @@ def kmeans(examples: List[Dict[str, float]], K: int,
             final reconstruction loss)
     '''
     # BEGIN_YOUR_CODE (our solution is 28 lines of code, but don't worry if you deviate from this)
-    def Distancia(punto : Dict[str,float] , centro : Dict[str,float]):
-        suma=0
-        for coordenada in (punto) :
-            if coordenada in centro:
-                suma+=(punto[coordenada]-centro[coordenada])**2
-            else:
-                suma+=(punto[coordenada])**2
+
+    def ReconstructionRoss():
+        suma =0
+        for i in range(tamMuestra):
+            suma += Distancia(i, pertenencias[i] )
         return suma
 
-    def PuntPertCentro(punto:Dict[str,float]):
-        distMinima = Distancia(punto,pCentroides[0])
+    def Distancia(idPunto , idCentro ):
+        return( memPuntos[idPunto] -  2*dotProduct(examples[idPunto],pCentroides[idCentro]) + memCentroides[idCentro] )
+
+    def PuntPertCentro(idPunto):
+        distMinima = Distancia(idPunto,0)
         iMinima = 0
         for i in range(1,K):
-            distAux = Distancia(punto,pCentroides[i]) 
+            distAux = Distancia(idPunto,i) 
             if(distAux < distMinima):
                 distMinima = distAux
                 iMinima = i
         return iMinima
 
-    def PuntoIgual(idCentro):
+    def PuntoIgual(idCentro): 
         for i in range(tamMuestra):
             if( (pertenencias[i] == idCentro or pertPasadas[i] == idCentro)
                  and pertPasadas[i] != pertenencias[i]):
                 return False
-            
         return True
 
-    def RecalcularPunto(idPunto):
+    def RecalcularCentro(idPunto,centro):
         res =  dict()
         numPuntos=0
         for i in range(tamMuestra):
@@ -221,42 +224,45 @@ def kmeans(examples: List[Dict[str, float]], K: int,
 
         return True
 
+   
     tamMuestra = len(examples)
-    pertenencias = [-1]*tamMuestra
-    pertPasadas =  pertenencias.copy()
+    pertenencias = [-1]*(tamMuestra+1)
     pCentroides = random.sample( examples , K) 
     
+    memCentroides = [-1]*K
+    memPuntos = [-1]*tamMuestra
+    for i,punto in enumerate(examples):
+        memPuntos[i] = dotProduct(punto,punto)
+    
+    #Sacamos la primera iteracion por ser especial wuuu
 
+    for i,centroide in enumerate(pCentroides):
+        memCentroides[i] = dotProduct(centroide,centroide)
 
-    for posPunto,punto in enumerate(examples):
-            pertenencias[posPunto]=PuntPertCentro(punto)
+    for posPunto in range(tamMuestra):
+            pertenencias[posPunto]=PuntPertCentro(posPunto)
 
     for idCentro,centro in enumerate(pCentroides):
-        if PuntoIgual(idCentro):
-            continue
-        pCentroides[idCentro] = RecalcularPunto(idCentro)
-    
-    for i in range(tamMuestra):
-        pertPasadas[i] = pertenencias[i]
+        pCentroides[idCentro] = RecalcularCentro(idCentro,centro)
+    pertPasadas = pertenencias.copy()
 
 
-    i = 1
-    while(i < maxEpochs):
-        i+=1
+    #Empieza el ciclo bien bien
+    for i in range(1,maxEpochs):
+        for i,centroide in enumerate(pCentroides):
+            memCentroides[i] = dotProduct(centroide,centroide)
 
-        for posPunto,punto in enumerate(examples):
-            pertenencias[posPunto]=PuntPertCentro(punto)
+        for posPunto in range(tamMuestra):
+            pertenencias[posPunto]=PuntPertCentro(posPunto)
 
         if(Convergio()):
             break
 
         for idCentro,centro in enumerate(pCentroides):
-            if PuntoIgual(idCentro):
-                continue
-            pCentroides[idCentro] = RecalcularPunto(idCentro)
-        
-        for i in range(tamMuestra):
-            pertPasadas[i] = pertenencias[i]
+            if not PuntoIgual(idCentro):
+                pCentroides[idCentro] = RecalcularCentro(idCentro,centro)
 
-    return pCentroides,pertenencias,2
+        pertPasadas = pertenencias.copy()
+
+    return pCentroides,pertenencias,ReconstructionRoss()
     # END_YOUR_CODE
